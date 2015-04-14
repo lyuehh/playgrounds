@@ -11,7 +11,6 @@ var data2 =
 
 function buildTree(tags) {
     var tree = {};
-    var tree = {};
     for (var x = 0; x < tags.length; x++) {
         var steps = tags[x].split('_');
 
@@ -64,4 +63,4 @@ var tree = buildTree(data2);
 
 console.log(tree);
 
-console.log(JSON.stringify(tree, null, 2));
+// console.log(JSON.stringify(tree, null, 2));
