@@ -61,6 +61,6 @@ function buildTree(tags) {
 
 var tree = buildTree(data2);
 
-console.log(tree);
+console.log(JSON.stringify(tree, null, 2));
 
 // console.log(JSON.stringify(tree, null, 2));

@@ -4,7 +4,7 @@ def check(str1, str2):
         return False
     obj1 = {}
     obj2 = {}
-    
+
     arr1 = list(str1)
     arr2 = list(str2)
 
