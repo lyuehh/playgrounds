@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>demo</title>
+    <script src="jquery.js"></script>
+    <style type="text/css" media="all">
+        .b {
+            width: 200px;
+            height: 200px
+        }
+    </style>
+</head>
+<body>
+    <input type="text" name="a" id="a" value="" />
+    <div class="b">123 4                    5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6</div>
+    &lt; &gt; &nbsp;
+    <button class="c">click</button>
+    <a href="javascript:alert('a')">ccc</a>
+
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            $('.c').on('click', function(e) {
+                var a = $('#a').val();
+                $('.b').text(a);
+            })
+        })
+    </script>
+</body>
+</html>
