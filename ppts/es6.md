@@ -2,7 +2,7 @@ title: ES6(ES2015) 简介
 speaker: 王伟伟
 url: todo
 transition: move
-files: 
+files:
 theme: moon
 
 [slide]
@@ -22,7 +22,7 @@ theme: moon
 
 * [Ecma-262.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf)
 * [Understanding ECMAScript 6 ](Understanding ECMAScript 6) <span class="label label-default">by Nicholas C. Zakas</span>
-* [Exploring ES6](https://leanpub.com/exploring-es6/read)<span class="label label-default">by Axel Rauschmayer</span> 
+* [Exploring ES6](https://leanpub.com/exploring-es6/read)<span class="label label-default">by Axel Rauschmayer</span>
 * [ECMAScript 6 入门](http://es6.ruanyifeng.com/#docs/intro) <span class="label label-default">by ruanyifeng</span>
 * [Learn ES2015](https://babeljs.io/docs/learn-es2015/)<span class="label label-default">by babel</span>
 
@@ -916,85 +916,213 @@ String.prototype.includes
 
 
 [slide]
-## 
+## RegExp.prototype properties
 ---
 
 ```
+// 1
+/./igm.flags === "gim" && /./.flags === ""
+
 ```
 
 
 [slide]
-## 
+## Array static methods
 ---
 
 ```
+// 1
+Array.from({ 0: "foo", 1: "bar", length: 2 }) + '' === "foo,bar"
+
+// 2
+var iterable = (function*(){ yield 1; yield 2; yield 3; }());
+Array.from(iterable) + '' === "1,2,3";
+
+// 3
+Array.of(1, 2); // [1, 2]
+
 ```
 
 
 [slide]
-## 
+## Array.prototype methods
 ---
 
 ```
+// 1
+Array.prototype.copyWithin
+Array.prototype.find
+Array.prototype.findIndex
+Array.prototype.fill
+Array.prototype.keys
+Array.prototype.values
+Array.prototype.entries
+
 ```
 
 
 [slide]
-## 
+## Number properties
 ---
 
 ```
+// 1
+Number.isFinite
+Number.isInteger
+Number.isSafeInteger
+Number.isNaN
+
+Number.EPSILON
+Number.MIN_SAFE_INTEGER
+Number.MAX_SAFE_INTEGER
+
 ```
 
 
 [slide]
-## 
+## Math methods
 ---
 
 ```
+Math.clz32
+Math.imul
+Math.sign
+...等等等
 ```
 
 
 [slide]
-## 
+## Subclassing
 ---
 
 ```
+Array
+RegExp
+Function
+Promise
+Boolean
+Number
+String
+Map
+Set
 ```
 
 
 [slide]
-## 
+## Misc
+---
+
+
+[slide]
+## prototype of bound functions
 ---
 
 ```
+// 1
+function correctProtoBound(proto) {
+  var f = function(){};
+  if (Object.setPrototypeOf) {
+    Object.setPrototypeOf(f, proto);
+  }
+  else {
+    f.__proto__ = proto;
+  }
+  var boundF = Function.prototype.bind.call(f, null);
+  return Object.getPrototypeOf(boundF) === proto;
+}
+correctProtoBound(Function.prototype)
+  && correctProtoBound({})
+  && correctProtoBound(null);
 ```
 
 
 [slide]
-## 
+## Object static methods accept primitives
 ---
 
 ```
+// 1
+Object.getPrototypeOf('a').constructor === String;
+
+// 2
+Object.getOwnPropertyDescriptor('a', 'foo') === undefined;
+
+// 3
+Object.seal('a') === 'a';
+Object.freeze('a') === 'a';
+Object.preventExtensions('a') === 'a';
+Object.isSealed('a') === true;
+Object.isFrozen('a') === true;
+Object.isExtensible('a') === false;
+
+
+// 4
+var s = Object.keys('a');
+s.length === 1 && s[0] === '0';
 ```
 
 
 [slide]
-## 
+## own property order
+---
+
+```
+// 1
+var obj = {
+  2:    true,
+  0:    true,
+  1:    true,
+  ' ':  true,
+  9:    true,
+  D:    true,
+  B:    true,
+  '-1': true,
+};
+obj.A = true;
+obj[3] = true;
+Object.defineProperty(obj, 'C', { value: true, enumerable: true });
+Object.defineProperty(obj, '4', { value: true, enumerable: true });
+delete obj[2];
+obj[2] = true;
+
+var result = '';
+for(var i in obj) {
+  result += i;
+}
+return result === "012349 DB-1AC";
+
+Object.keys
+Object.getOwnPropertyNames
+JSON.stringify
+JSON.parse
+```
+
+
+[slide]
+## __proto__ in object literals
+---
+
+```
+// 1
+{ __proto__ : [] } instanceof Array
+  && !({ __proto__ : null } instanceof Object);
+
+// 2
+var A = function(){};
+(new A()).__proto__ === A.prototype;
+
+// 3
+var o = {};
+o.__proto__ = Array.prototype;
+o instanceof Array;
+
+```
+
+
+[slide]
+##
 ---
 
 ```
 ```
-
-
-
-
-
-
-
-
-
-
-
-
 
