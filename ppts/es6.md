@@ -1,4 +1,4 @@
-title: ES6 简介
+title: ES6(ES2015) 简介
 speaker: 王伟伟
 url: todo
 transition: move
@@ -567,119 +567,351 @@ new C().qux("baz") === "foobarbaz";
 
 ```
 // 1
+function * generator(){
+  yield 5; yield 6;
+};
+var iterator = generator();
+var item = iterator.next();
+item.value === 5 && item.done === false;
+item = iterator.next();
+item.value === 6 && item.done === false;
+item = iterator.next();
+item.value === undefined && item.done === true;
+
+// 2
+function * generator(){
+  yield this.x; yield this.y;
+};
+try {
+  (new generator()).next();
+}
+catch (e) {
+  return true;
+}
 
 ```
 
 
 [slide]
-## 
+## Built-ins
+---
+
+
+[slide]
+## typed arrays
 ---
 
 ```
+// 1
+var buffer = new ArrayBuffer(64);
+var view = new Int8Array(buffer);
+
+Uint8Array
+Uint8ClampedArray
+Int16Array
+Uint16Array
+Int32Array
+Uint32Array
+Float32Array
+Float64Array
+
+DataView
+ArrayBuffer
+
 ```
 
 
 [slide]
-## 
+## Map
 ---
 
 ```
+// 1
+var key = {};
+var map = new Map();
+map.set(key, 123);
+map.has(key) && map.get(key) === 123;
+
+// 2
+var key1 = {};
+var key2 = {};
+var map = new Map([[key1, 123], [key2, 456]]);
+
+map.has(key1) && map.get(key1) === 123 &&
+map.has(key2) && map.get(key2) === 456;
+
+map.size === 2
+Map.prototype.delete
+Map.prototype.clear
+Map.prototype.forEach
+Map.prototype.keys
+Map.prototype.values
+Map.prototype.entries
+
+
 ```
 
 
 [slide]
-## 
+## Set
 ---
 
 ```
+// 1
+var obj = {};
+var set = new Set();
+
+set.add(123);
+set.add(123);
+
+set.has(123);
+
+// 2
+var obj1 = {};
+var obj2 = {};
+var set = new Set([obj1, obj2]);
+
+set.has(obj1) && set.has(obj2);
+
+set.size == 2
+Set.prototype.delete
+Set.prototype.clear
+Set.prototype.forEach
+Set.prototype.keys
+Set.prototype.values
+Set.prototype.entries
+
 ```
 
 
 [slide]
-## 
+## WeakMap WeakSet
 ---
 
 ```
+// 1
+var key = {};
+var weakmap = new WeakMap();
+
+weakmap.set(key, 123);
+
+weakmap.has(key) && weakmap.get(key) === 123;
+
+WeakMap.prototype.delete
+
+// 2
+var obj1 = {};
+var weakset = new WeakSet();
+
+weakset.add(obj1);
+weakset.add(obj1);
+
+weakset.has(obj1);
+WeakSet.prototype.delete
+
 ```
 
 
 [slide]
-## 
+## Proxy
 ---
 
 ```
+// 1
+var proxied = { };
+var proxy = new Proxy(proxied, {
+  get: function (t, k, r) {
+    return t === proxied && k === "foo" && r === proxy && 5;
+  }
+});
+proxy.foo === 5;
+
+// 2
+var proxied = { };
+var passed = false;
+var proxy = new Proxy(proxied, {
+  set: function (t, k, v, r) {
+    passed = t === proxied && k + v === "foobar" && r === proxy;
+  }
+});
+proxy.foo = "bar";
+
+set
+get
+has
+deleteProperty
+getOwnPropertyDescriptor
+defineProperty
+getPrototypeOf
+setPrototypeOf
+isExtensible
+preventExtensions
+enumerate
+ownKeys
+apply
+construct
 ```
 
 
 [slide]
-## 
+## Reflect
 ---
 
 ```
+// 1
+Reflect.get({ qux: 987 }, "qux") === 987
+
+// 2
+var obj = {};
+Reflect.set(obj, "quux", 654);
+obj.quux === 654;
+
+// 3
+Reflect.has({ qux: 987 }, "qux")
+
+// 等等等
 ```
 
 
 [slide]
-## 
+## Promise
 ---
 
 ```
+// 1
+var p1 = new Promise(function(resolve, reject) { resolve("foo"); });
+var p2 = new Promise(function(resolve, reject) { reject("quux"); });
+var score = 0;
+
+function thenFn(result)  { score += (result === "foo");  check(); }
+function catchFn(result) { score += (result === "quux"); check(); }
+function shouldNotRun(result)  { score = -Infinity;   }
+
+p1.then(thenFn, shouldNotRun);
+p2.then(shouldNotRun, catchFn);
+p1.catch(shouldNotRun);
+p2.catch(catchFn);
+
+p1.then(function() {
+  // Promise.prototype.then() should return a new Promise
+  score += p1.then() !== p1;
+  check();
+});
+
+function check() {
+  if (score === 4) asyncTestPassed();
+}
+
+Promise.all
+Promise.race
 ```
 
 
 [slide]
-## 
+## Symbol
 ---
 
 ```
+// 1
+var object = {};
+var symbol = Symbol();
+var value = {};
+object[symbol] = value;
+object[symbol] === value;
+
+// 2
+typeof Symbol() === "symbol";
+
+// 3
+var symbol = Symbol.for('foo');
+Symbol.for('foo') === symbol &&
+   Symbol.keyFor(symbol) === 'foo';
 ```
 
 
 [slide]
-## 
+## Built-in extensions
+---
+
+
+[slide]
+## Object static methods
 ---
 
 ```
+// 1
+var o = Object.assign({a:true}, {b:true}, {c:true});
+"a" in o && "b" in o && "c" in o;
+
+// 2
+typeof Object.is === 'function' &&
+  Object.is(NaN, NaN) &&
+ !Object.is(-0, 0);
+
+// 3
+var o = {};
+var sym = Symbol(), sym2 = Symbol(), sym3 = Symbol();
+o[sym]  = true;
+o[sym2] = true;
+o[sym3] = true;
+var result = Object.getOwnPropertySymbols(o);
+result[0] === sym
+  && result[1] === sym2
+  && result[2] === sym3;
+
+// 4
+Object.setPrototypeOf({}, Array.prototype) instanceof Array;
 ```
 
 
 [slide]
-## 
+## function "name" property
 ---
 
 ```
+// 1
+function foo(){};
+foo.name === 'foo' &&
+  (function(){}).name === '';
+
+// 2
+function foo() {};
+foo.bind({}).name === "bound foo" &&
+  (function(){}).bind({}).name === "bound ";
+
 ```
 
 
 [slide]
-## 
+## String static methods
 ---
 
 ```
+// 1
+typeof String.raw === 'function';
+
+// 2
+name = 'Bob';
+String.raw`Hi, ${name}!`;
+
+// 3
+String.fromCodePoint(65) // A
 ```
 
 
 [slide]
-## 
+## String.prototype methods
 ---
 
 ```
-```
+// 1
+'A'.codePointAt()
 
-
-[slide]
-## 
----
-
-```
-```
-
-
-[slide]
-## 
----
-
-```
+String.prototype.normalize
+String.prototype.repeat
+String.prototype.startsWith
+String.prototype.endsWith
+String.prototype.includes
 ```
 
 
