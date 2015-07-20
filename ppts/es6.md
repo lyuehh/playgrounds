@@ -2,7 +2,7 @@ title: ES6(ES2015) 简介
 speaker: 王伟伟
 url: todo
 transition: move
-files:
+files: /js/zoom.js
 theme: moon
 
 [slide]
