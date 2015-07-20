@@ -27,7 +27,11 @@ theme: moon
 * [Learn ES2015](https://babeljs.io/docs/learn-es2015/)<span class="label label-default">by babel</span>
 
 [slide]
-## Module (several per module)
+## Module
+
+
+[slide]
+## several per module
 ---
 
 ```
@@ -55,7 +59,7 @@ console.log(lib.diag(4, 3)); // 5
 ```
 
 [slide]
-## Module (several per module) 续
+## several per module 续
 ---
 
 ```
@@ -84,7 +88,7 @@ console.log(diag(4, 3)); // 5
 ```
 
 [slide]
-## Module (one per module)
+## one per module
 ---
 
 ```javascript
@@ -107,7 +111,7 @@ let inst = new MyClass();
 
 
 [slide]
-## Named exports and a default export
+## named exports and a default export
 ---
 
 ```javascript
