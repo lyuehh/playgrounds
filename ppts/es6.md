@@ -876,14 +876,15 @@ Promise.race
 
 ```
 // 1
-var object = {};
-var symbol = Symbol();
-var value = {};
-object[symbol] = value;
-object[symbol] === value;
+var sym1 = Symbol();
+var sym2 = Symbol("foo");
+var sym3 = Symbol("foo");
+
+Symbol("foo") === Symbol("foo"); // false
 
 // 2
 typeof Symbol() === "symbol";
+new Symbol(); // ERROR
 
 // 3
 var symbol = Symbol.for('foo');
@@ -942,6 +943,12 @@ function foo() {};
 foo.bind({}).name === "bound foo" &&
   (function(){}).bind({}).name === "bound ";
 
+// 3
+class foo {};
+class bar { static name() {} };
+foo.name === "foo" &&
+  typeof bar.name === "function";
+
 ```
 
 
@@ -975,6 +982,7 @@ String.prototype.repeat
 String.prototype.startsWith
 String.prototype.endsWith
 String.prototype.includes
+String.prototype[Symbol.iterator]
 ```
 
 
@@ -1020,6 +1028,7 @@ Array.prototype.fill
 Array.prototype.keys
 Array.prototype.values
 Array.prototype.entries
+Array.prototype[Symbol.iterator]
 
 ```
 
@@ -1046,11 +1055,13 @@ Number.MAX_SAFE_INTEGER
 ## Math methods
 ---
 
-```
+```javascript
 Math.clz32
 Math.imul
 Math.sign
-...等等等
+Math.log10
+Math.log2
+//...等等等
 ```
 
 
@@ -1059,6 +1070,15 @@ Math.sign
 ---
 
 ```
+// 1
+class C extends Array {}
+var c = new C();
+var len1 = c.length;
+c[2] = 'foo';
+var len2 = c.length;
+return len1 === 0 && len2 === 3;
+
+// 2
 Array
 RegExp
 Function
@@ -1156,10 +1176,30 @@ return result === "012349 DB-1AC";
 
 Object.keys
 Object.getOwnPropertyNames
+Object.assign
 JSON.stringify
 JSON.parse
 ```
 
+[slide]
+## miscellaneous
+---
+
+```
+// 1
+do {} while (false) return true;
+
+// 2
+try {
+  eval('for (var i = 0 in {}) {}');
+}
+catch(e) {
+  return true;
+}
+
+// 3
+new RegExp(/./im, "g").global === true;
+```
 
 [slide]
 ## __proto__ in object literals
@@ -1171,21 +1211,155 @@ JSON.parse
   && !({ __proto__ : null } instanceof Object);
 
 // 2
-var A = function(){};
-(new A()).__proto__ === A.prototype;
+eval("({ __proto__ : [], __proto__: {} })"); // ERROR
 
-// 3
-var o = {};
-o.__proto__ = Array.prototype;
-o instanceof Array;
 
 ```
 
 
 [slide]
-##
+## Object.prototype.__proto__
 ---
 
 ```
+// 1
+var A = function(){};
+(new A()).__proto__ === A.prototype;
+
+// 2
+var o = {};
+o.__proto__ = Array.prototype;
+o instanceof Array;
+
+// 3
+Object.prototype.hasOwnProperty('__proto__'); // true
+
 ```
+
+[slide]
+## ES7 前瞻
+---
+
+```
+// 1
+2 ** 3 === 8
+
+// 2
+Object.observe
+Array.prototype.includes
+
+// 4
+SIMD (Single Instruction, Multiple Data) 支持
+
+// 5
+typeof function f( a, b, ){} === 'function'
+Math.min(1,2,3,) === 1
+
+```
+
+[slide]
+## 续 1
+---
+
+```
+// 1
+return (async function(){
+  return 42 + await Promise.resolve(42)
+})() instanceof Promise
+
+// 2
+(async () => 42 + await Promise.resolve(42))() instanceof Promise
+
+// 3
+class A {
+  @nonconf
+  get B() {}
+}
+function nonconf(target, name, descriptor) {
+  descriptor.configurable = false;
+  return descriptor;
+}
+Object.getOwnPropertyDescriptor(A.prototype, "B").configurable === false;
+
+```
+
+[slide]
+## 续 2
+---
+
+```
+// 1
+async function * nums() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+var result = '';
+async function printData() {
+  for(var x on nums()) {
+    result += x;
+  }
+}
+result === "123";
+
+// 2
+var {a, ...rest} = {a: 1, b: 2, c: 3};
+a === 1 && rest.a === undefined && rest.b === 2 && rest.c === 3;
+
+// 3
+var spread = {b: 2, c: 3};
+var O = {a: 1, ...spread};
+O.a + O.b + O.c === 6;
+```
+
+[slide]
+## 续3
+---
+
+```
+// 1
+function foo() { this.garply += "foo"; return this; }
+var obj = { garply: "bar" };
+typeof obj::foo === "function" && obj::foo().garply === "barfoo";
+
+// 2
+var obj = { garply: "bar", foo: function() { this.garply += "foo"; return this; } };
+typeof ::obj.foo === "function" && ::obj.foo().garply === "barfoo";
+
+// 3
+Object.getOwnPropertyDescriptors
+Map.prototype.toJSON
+Set.prototype.toJSON
+String.prototype.at
+String.prototype.lpad
+String.prototype.rpad
+Object.values
+Object.entries
+
+```
+
+[slide]
+## 续4
+---
+
+```javascript
+// 1 parallel JavaScript
+Array.prototype.mapPar
+Array.prototype.filterPar
+Array.fromPar
+// ..等等
+
+// 2
+[for (a of [1, 2, 3]) a * a] + '' === '1,4,9'
+
+// 3
+[for([a, b] of [['a', 'b']])a + b][0] === 'ab'
+
+```
+
+[slide]
+## All Done
+---
+
+Thanks
 
