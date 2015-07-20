@@ -27,6 +27,105 @@ theme: moon
 * [Learn ES2015](https://babeljs.io/docs/learn-es2015/)<span class="label label-default">by babel</span>
 
 [slide]
+## Module (several per module)
+---
+
+```
+// Named exports
+
+//------ lib.js ------
+export const sqrt = Math.sqrt;
+export function square(x) {
+    return x * x;
+}
+export function diag(x, y) {
+    return sqrt(square(x) + square(y));
+}
+
+//------ main.js ------
+import { square, diag } from 'lib';
+console.log(square(11)); // 121
+console.log(diag(4, 3)); // 5
+
+// or
+import * as lib from 'lib';
+console.log(lib.square(11)); // 121
+console.log(lib.diag(4, 3)); // 5
+
+```
+
+[slide]
+## Module (several per module) 续
+---
+
+```
+// CommonJS
+
+//------ lib.js ------
+var sqrt = Math.sqrt;
+function square(x) {
+    return x * x;
+}
+function diag(x, y) {
+    return sqrt(square(x) + square(y));
+}
+module.exports = {
+    sqrt: sqrt,
+    square: square,
+    diag: diag,
+};
+
+//------ main.js ------
+var square = require('lib').square;
+var diag = require('lib').diag;
+console.log(square(11)); // 121
+console.log(diag(4, 3)); // 5
+
+```
+
+[slide]
+## Module (one per module)
+---
+
+```javascript
+// function
+//------ myFunc.js ------
+export default function () { ... };
+
+//------ main1.js ------
+import myFunc from 'myFunc';
+myFunc();
+
+// class
+//------ MyClass.js ------
+export default class { ... };
+
+//------ main2.js ------
+import MyClass from 'MyClass';
+let inst = new MyClass();
+```
+
+
+[slide]
+## Named exports and a default export
+---
+
+```javascript
+//------ underscore.js ------
+export default function (obj) {
+    //...
+};
+export function each(obj, iterator, context) {
+    //...
+}
+export { each as forEach };
+
+//------ main.js ------
+import _, { each } from 'underscore';
+```
+
+
+[slide]
 ## Syntax
 
 
