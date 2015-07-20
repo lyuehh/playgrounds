@@ -183,7 +183,7 @@ Number('0b1') === 1
 ```jvascript
 // 1
 var a = "ba", b = "QUX";
-return `foo bar
+`foo bar
 ${a + "z"} ${b.toLowerCase()}` === "foo bar\nbaz qux"
 
 // 2
@@ -208,14 +208,24 @@ fn `foo${123}bar\n${456}` && called
 
 ```
 // 1
-var re = new RegExp('\\w');
-var re2 = new RegExp('\\w', 'y');
-re.exec('xy');
-re2.exec('xy');
-(re.exec('xy')[0] === 'x' && re2.exec('xy')[0] === 'y')
+var text = 'First line\nsecond line';
+var regex = /(\S+) line\n?/y;
+
+var match = regex.exec(text);
+console.log(match[1]);        // logs 'First'
+console.log(regex.lastIndex); // logs '11'
+
+var match2 = regex.exec(text);
+console.log(match2[1]);       // logs 'Second'
+console.log(regex.lastIndex); // logs '22'
+
+var match3 = regex.exec(text);
+console.log(match3 === null); // logs 'true'
 
 // 2
-"𠮷".match(/^.$/u)[0].length === 2
+var string = 'a𝌆b';
+console.log(/a.b/.test(string)); // false
+console.log(/a.b/u.test(string)); // true
 ```
 
 
@@ -589,6 +599,15 @@ catch (e) {
   return true;
 }
 
+// 3
+var o = {
+  * generator() {
+    yield 5; yield 6;
+  },
+};
+var iterator = o.generator();
+// ...
+
 ```
 
 
@@ -606,6 +625,7 @@ catch (e) {
 var buffer = new ArrayBuffer(64);
 var view = new Int8Array(buffer);
 
+Int8Array
 Uint8Array
 Uint8ClampedArray
 Int16Array
@@ -625,7 +645,7 @@ ArrayBuffer
 ## Map
 ---
 
-```
+```javascript
 // 1
 var key = {};
 var map = new Map();
@@ -633,6 +653,16 @@ map.set(key, 123);
 map.has(key) && map.get(key) === 123;
 
 // 2
+var passed = false;
+var _set = Map.prototype.set;
+Map.prototype.set = function(k, v) {
+  passed = true;
+};
+new Map([ [1, 2] ]);
+Map.prototype.set = _set;
+passed
+
+// 3
 var key1 = {};
 var key2 = {};
 var map = new Map([[key1, 123], [key2, 456]]);
@@ -647,7 +677,7 @@ Map.prototype.forEach
 Map.prototype.keys
 Map.prototype.values
 Map.prototype.entries
-
+Map.prototype[Symbol.iterator]
 
 ```
 
@@ -663,8 +693,18 @@ var set = new Set();
 
 set.add(123);
 set.add(123);
-
 set.has(123);
+
+// 2
+var passed = false;
+var _add = Set.prototype.add;
+Set.prototype.add = function(v) {
+  passed = true;
+};
+new Set([1]);
+Set.prototype.add = _add;
+
+passed;
 
 // 2
 var obj1 = {};
@@ -680,6 +720,7 @@ Set.prototype.forEach
 Set.prototype.keys
 Set.prototype.values
 Set.prototype.entries
+Set.prototype[Symbol.iterator]
 
 ```
 
@@ -760,16 +801,38 @@ construct
 ```
 // 1
 Reflect.get({ qux: 987 }, "qux") === 987
-
-// 2
 var obj = {};
 Reflect.set(obj, "quux", 654);
 obj.quux === 654;
+Reflect.has({ qux: 987 }, "qux")
+var obj = { bar: 456 };
+Reflect.deleteProperty(obj, "bar");
+
+// 2
+({ qux: 987 }).qux
+({}).qux = 654
+('qux' in {qux: 654})
+var obj = { bar: 456 };
+delete obj.bar
 
 // 3
-Reflect.has({ qux: 987 }, "qux")
+try { Object.defineProperty(obj, name, desc); } catch (e) { }
 
-// 等等等
+if (Reflect.defineProperty(obj, name, desc)) { // success
+} else { // failure }
+
+// 4
+Reflect.getOwnPropertyDescriptor
+Reflect.defineProperty
+Reflect.getPrototypeOf
+Reflect.setPrototypeOf
+Reflect.isExtensible
+Reflect.preventExtensions
+Reflect.enumerate
+Reflect.ownKeys
+Reflect.apply
+Reflect.construct
+
 ```
 
 
