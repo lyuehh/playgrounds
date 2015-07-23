@@ -290,7 +290,6 @@ var a = "ba", b = "QUX";
 ${a + "z"} ${b.toLowerCase()}` === "foo bar\nbaz qux"
 
 // 2
-var called = false;
 function fn(parts, a, b) {
   called = true;
   return parts instanceof Array &&
@@ -301,7 +300,9 @@ function fn(parts, a, b) {
     a === 123                   &&
     b === 456;
 }
-fn `foo${123}bar\n${456}` && called
+fn `foo${123}bar\n${456}`
+
+fn(['foo', 'bar\n'], 123, 456)
 ```
 
 
@@ -311,24 +312,23 @@ fn `foo${123}bar\n${456}` && called
 
 ```
 // 1
-var text = 'First line\nsecond line';
-var regex = /(\S+) line\n?/y;
+var s = "aaa_aa_a";
+var r1 = /a+/g;
+var r2 = /a+/y;
 
-var match = regex.exec(text);
-console.log(match[1]);        // logs 'First'
-console.log(regex.lastIndex); // logs '11'
+r1.exec(s) // ["aaa"]
+r2.exec(s) // ["aaa"]
 
-var match2 = regex.exec(text);
-console.log(match2[1]);       // logs 'Second'
-console.log(regex.lastIndex); // logs '22'
-
-var match3 = regex.exec(text);
-console.log(match3 === null); // logs 'true'
+r1.exec(s) // ["aa"]
+r2.exec(s) // null
 
 // 2
 var string = 'a𝌆b';
 console.log(/a.b/.test(string)); // false
 console.log(/a.b/u.test(string)); // true
+
+/\u{61}/.test('a') // false
+/\u{61}/u.test('a') // true
 ```
 
 
@@ -993,6 +993,29 @@ new Symbol(); // ERROR
 var symbol = Symbol.for('foo');
 Symbol.for('foo') === symbol &&
    Symbol.keyFor(symbol) === 'foo';
+```
+
+[slide]
+## well-known symbols
+---
+
+```javascript
+// 1
+Symbol.hasInstance
+
+foo instanceof Foo
+// 等同于
+Foo[Symbol.hasInstance](foo)
+
+// 2
+
+Symbol.isConcatSpreadable
+Symbol.iterator
+Symbol.species
+Symbol.toPrimitive
+Symbol.toStringTag
+Symbol.unscopables
+
 ```
 
 
