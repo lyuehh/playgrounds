@@ -21,7 +21,7 @@ theme: moon
 ----
 
 * [Ecma-262.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf)
-* [Understanding ECMAScript 6 ](Understanding ECMAScript 6) <span class="label label-default">by Nicholas C. Zakas</span>
+* [Understanding ECMAScript 6 ](https://leanpub.com/understandinges6/read/) <span class="label label-default">by Nicholas C. Zakas</span>
 * [Exploring ES6](https://leanpub.com/exploring-es6/read)<span class="label label-default">by Axel Rauschmayer</span>
 * [ECMAScript 6 入门](http://es6.ruanyifeng.com/#docs/intro) <span class="label label-default">by ruanyifeng</span>
 * [Learn ES2015](https://babeljs.io/docs/learn-es2015/)<span class="label label-default">by babel</span>
