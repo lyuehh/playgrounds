@@ -2,7 +2,7 @@ title: ES6(ES2015) 简介
 speaker: 王伟伟
 url: todo
 transition: move
-files:
+files: /js/zoom.js
 theme: moon
 
 [slide]
@@ -21,10 +21,116 @@ theme: moon
 ----
 
 * [Ecma-262.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf)
-* [Understanding ECMAScript 6 ](Understanding ECMAScript 6) <span class="label label-default">by Nicholas C. Zakas</span>
+* [Understanding ECMAScript 6 ](https://leanpub.com/understandinges6/read/) <span class="label label-default">by Nicholas C. Zakas</span>
 * [Exploring ES6](https://leanpub.com/exploring-es6/read)<span class="label label-default">by Axel Rauschmayer</span>
 * [ECMAScript 6 入门](http://es6.ruanyifeng.com/#docs/intro) <span class="label label-default">by ruanyifeng</span>
 * [Learn ES2015](https://babeljs.io/docs/learn-es2015/)<span class="label label-default">by babel</span>
+
+[slide]
+## Module
+
+
+[slide]
+## several per module
+---
+
+```
+// Named exports
+
+//------ lib.js ------
+export const sqrt = Math.sqrt;
+export function square(x) {
+    return x * x;
+}
+export function diag(x, y) {
+    return sqrt(square(x) + square(y));
+}
+
+//------ main.js ------
+import { square, diag } from 'lib';
+console.log(square(11)); // 121
+console.log(diag(4, 3)); // 5
+
+// or
+import * as lib from 'lib';
+console.log(lib.square(11)); // 121
+console.log(lib.diag(4, 3)); // 5
+
+```
+
+[slide]
+## several per module 续
+---
+
+```
+// CommonJS
+
+//------ lib.js ------
+var sqrt = Math.sqrt;
+function square(x) {
+    return x * x;
+}
+function diag(x, y) {
+    return sqrt(square(x) + square(y));
+}
+module.exports = {
+    sqrt: sqrt,
+    square: square,
+    diag: diag,
+};
+
+//------ main.js ------
+var square = require('lib').square;
+var diag = require('lib').diag;
+console.log(square(11)); // 121
+console.log(diag(4, 3)); // 5
+
+```
+
+[slide]
+## one per module
+---
+
+```javascript
+// function
+//------ myFunc.js ------
+export default function () { ... };
+
+//------ main1.js ------
+import myFunc from 'myFunc';
+myFunc();
+
+// class
+//------ MyClass.js ------
+export default class { ... };
+
+//------ main2.js ------
+import MyClass from 'MyClass';
+let inst = new MyClass();
+```
+
+
+[slide]
+[note]
+<http://www.2ality.com/2014/09/es6-modules-final.html>
+[/note]
+## named exports and a default export
+---
+
+```javascript
+//------ underscore.js ------
+export default function (obj) {
+    //...
+};
+export function each(obj, iterator, context) {
+    //...
+}
+export { each as forEach };
+
+//------ main.js ------
+import _, { each } from 'underscore';
+```
+
 
 [slide]
 ## Syntax
@@ -183,11 +289,10 @@ Number('0b1') === 1
 ```jvascript
 // 1
 var a = "ba", b = "QUX";
-return `foo bar
+`foo bar
 ${a + "z"} ${b.toLowerCase()}` === "foo bar\nbaz qux"
 
 // 2
-var called = false;
 function fn(parts, a, b) {
   called = true;
   return parts instanceof Array &&
@@ -198,7 +303,9 @@ function fn(parts, a, b) {
     a === 123                   &&
     b === 456;
 }
-fn `foo${123}bar\n${456}` && called
+fn `foo${123}bar\n${456}`
+
+fn(['foo', 'bar\n'], 123, 456)
 ```
 
 
@@ -208,14 +315,23 @@ fn `foo${123}bar\n${456}` && called
 
 ```
 // 1
-var re = new RegExp('\\w');
-var re2 = new RegExp('\\w', 'y');
-re.exec('xy');
-re2.exec('xy');
-(re.exec('xy')[0] === 'x' && re2.exec('xy')[0] === 'y')
+var s = "aaa_aa_a";
+var r1 = /a+/g;
+var r2 = /a+/y;
+
+r1.exec(s) // ["aaa"]
+r2.exec(s) // ["aaa"]
+
+r1.exec(s) // ["aa"]
+r2.exec(s) // null
 
 // 2
-"𠮷".match(/^.$/u)[0].length === 2
+var string = 'a𝌆b';
+console.log(/a.b/.test(string)); // false
+console.log(/a.b/u.test(string)); // true
+
+/\u{61}/.test('a') // false
+/\u{61}/u.test('a') // true
 ```
 
 
@@ -589,6 +705,15 @@ catch (e) {
   return true;
 }
 
+// 3
+var o = {
+  * generator() {
+    yield 5; yield 6;
+  },
+};
+var iterator = o.generator();
+// ...
+
 ```
 
 
@@ -606,6 +731,7 @@ catch (e) {
 var buffer = new ArrayBuffer(64);
 var view = new Int8Array(buffer);
 
+Int8Array
 Uint8Array
 Uint8ClampedArray
 Int16Array
@@ -625,7 +751,7 @@ ArrayBuffer
 ## Map
 ---
 
-```
+```javascript
 // 1
 var key = {};
 var map = new Map();
@@ -633,6 +759,16 @@ map.set(key, 123);
 map.has(key) && map.get(key) === 123;
 
 // 2
+var passed = false;
+var _set = Map.prototype.set;
+Map.prototype.set = function(k, v) {
+  passed = true;
+};
+new Map([ [1, 2] ]);
+Map.prototype.set = _set;
+passed
+
+// 3
 var key1 = {};
 var key2 = {};
 var map = new Map([[key1, 123], [key2, 456]]);
@@ -647,7 +783,7 @@ Map.prototype.forEach
 Map.prototype.keys
 Map.prototype.values
 Map.prototype.entries
-
+Map.prototype[Symbol.iterator]
 
 ```
 
@@ -663,8 +799,18 @@ var set = new Set();
 
 set.add(123);
 set.add(123);
-
 set.has(123);
+
+// 2
+var passed = false;
+var _add = Set.prototype.add;
+Set.prototype.add = function(v) {
+  passed = true;
+};
+new Set([1]);
+Set.prototype.add = _add;
+
+passed;
 
 // 2
 var obj1 = {};
@@ -680,6 +826,7 @@ Set.prototype.forEach
 Set.prototype.keys
 Set.prototype.values
 Set.prototype.entries
+Set.prototype[Symbol.iterator]
 
 ```
 
@@ -760,16 +907,38 @@ construct
 ```
 // 1
 Reflect.get({ qux: 987 }, "qux") === 987
-
-// 2
 var obj = {};
 Reflect.set(obj, "quux", 654);
 obj.quux === 654;
+Reflect.has({ qux: 987 }, "qux")
+var obj = { bar: 456 };
+Reflect.deleteProperty(obj, "bar");
+
+// 2
+({ qux: 987 }).qux
+({}).qux = 654
+('qux' in {qux: 654})
+var obj = { bar: 456 };
+delete obj.bar
 
 // 3
-Reflect.has({ qux: 987 }, "qux")
+try { Object.defineProperty(obj, name, desc); } catch (e) { }
 
-// 等等等
+if (Reflect.defineProperty(obj, name, desc)) { // success
+} else { // failure }
+
+// 4
+Reflect.getOwnPropertyDescriptor
+Reflect.defineProperty
+Reflect.getPrototypeOf
+Reflect.setPrototypeOf
+Reflect.isExtensible
+Reflect.preventExtensions
+Reflect.enumerate
+Reflect.ownKeys
+Reflect.apply
+Reflect.construct
+
 ```
 
 
@@ -813,19 +982,43 @@ Promise.race
 
 ```
 // 1
-var object = {};
-var symbol = Symbol();
-var value = {};
-object[symbol] = value;
-object[symbol] === value;
+var sym1 = Symbol();
+var sym2 = Symbol("foo");
+var sym3 = Symbol("foo");
+
+Symbol("foo") === Symbol("foo"); // false
 
 // 2
 typeof Symbol() === "symbol";
+new Symbol(); // ERROR
 
 // 3
 var symbol = Symbol.for('foo');
 Symbol.for('foo') === symbol &&
    Symbol.keyFor(symbol) === 'foo';
+```
+
+[slide]
+## well-known symbols
+---
+
+```javascript
+// 1
+Symbol.hasInstance
+
+foo instanceof Foo
+// 等同于
+Foo[Symbol.hasInstance](foo)
+
+// 2
+
+Symbol.isConcatSpreadable
+Symbol.iterator
+Symbol.species
+Symbol.toPrimitive
+Symbol.toStringTag
+Symbol.unscopables
+
 ```
 
 
@@ -879,6 +1072,12 @@ function foo() {};
 foo.bind({}).name === "bound foo" &&
   (function(){}).bind({}).name === "bound ";
 
+// 3
+class foo {};
+class bar { static name() {} };
+foo.name === "foo" &&
+  typeof bar.name === "function";
+
 ```
 
 
@@ -912,6 +1111,7 @@ String.prototype.repeat
 String.prototype.startsWith
 String.prototype.endsWith
 String.prototype.includes
+String.prototype[Symbol.iterator]
 ```
 
 
@@ -957,6 +1157,7 @@ Array.prototype.fill
 Array.prototype.keys
 Array.prototype.values
 Array.prototype.entries
+Array.prototype[Symbol.iterator]
 
 ```
 
@@ -983,11 +1184,13 @@ Number.MAX_SAFE_INTEGER
 ## Math methods
 ---
 
-```
+```javascript
 Math.clz32
 Math.imul
 Math.sign
-...等等等
+Math.log10
+Math.log2
+//...等等等
 ```
 
 
@@ -996,6 +1199,15 @@ Math.sign
 ---
 
 ```
+// 1
+class C extends Array {}
+var c = new C();
+var len1 = c.length;
+c[2] = 'foo';
+var len2 = c.length;
+return len1 === 0 && len2 === 3;
+
+// 2
 Array
 RegExp
 Function
@@ -1093,10 +1305,30 @@ return result === "012349 DB-1AC";
 
 Object.keys
 Object.getOwnPropertyNames
+Object.assign
 JSON.stringify
 JSON.parse
 ```
 
+[slide]
+## miscellaneous
+---
+
+```
+// 1
+do {} while (false) return true;
+
+// 2
+try {
+  eval('for (var i = 0 in {}) {}');
+}
+catch(e) {
+  return true;
+}
+
+// 3
+new RegExp(/./im, "g").global === true;
+```
 
 [slide]
 ## __proto__ in object literals
@@ -1108,21 +1340,155 @@ JSON.parse
   && !({ __proto__ : null } instanceof Object);
 
 // 2
-var A = function(){};
-(new A()).__proto__ === A.prototype;
+eval("({ __proto__ : [], __proto__: {} })"); // ERROR
 
-// 3
-var o = {};
-o.__proto__ = Array.prototype;
-o instanceof Array;
 
 ```
 
 
 [slide]
-##
+## Object.prototype.__proto__
 ---
 
 ```
+// 1
+var A = function(){};
+(new A()).__proto__ === A.prototype;
+
+// 2
+var o = {};
+o.__proto__ = Array.prototype;
+o instanceof Array;
+
+// 3
+Object.prototype.hasOwnProperty('__proto__'); // true
+
 ```
+
+[slide]
+## ES7 前瞻
+---
+
+```
+// 1
+2 ** 3 === 8
+
+// 2
+Object.observe
+Array.prototype.includes
+
+// 4
+SIMD (Single Instruction, Multiple Data) 支持
+
+// 5
+typeof function f( a, b, ){} === 'function'
+Math.min(1,2,3,) === 1
+
+```
+
+[slide]
+## 续 1
+---
+
+```
+// 1
+return (async function(){
+  return 42 + await Promise.resolve(42)
+})() instanceof Promise
+
+// 2
+(async () => 42 + await Promise.resolve(42))() instanceof Promise
+
+// 3
+class A {
+  @nonconf
+  get B() {}
+}
+function nonconf(target, name, descriptor) {
+  descriptor.configurable = false;
+  return descriptor;
+}
+Object.getOwnPropertyDescriptor(A.prototype, "B").configurable === false;
+
+```
+
+[slide]
+## 续 2
+---
+
+```
+// 1
+async function * nums() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+var result = '';
+async function printData() {
+  for(var x on nums()) {
+    result += x;
+  }
+}
+result === "123";
+
+// 2
+var {a, ...rest} = {a: 1, b: 2, c: 3};
+a === 1 && rest.a === undefined && rest.b === 2 && rest.c === 3;
+
+// 3
+var spread = {b: 2, c: 3};
+var O = {a: 1, ...spread};
+O.a + O.b + O.c === 6;
+```
+
+[slide]
+## 续3
+---
+
+```
+// 1
+function foo() { this.garply += "foo"; return this; }
+var obj = { garply: "bar" };
+typeof obj::foo === "function" && obj::foo().garply === "barfoo";
+
+// 2
+var obj = { garply: "bar", foo: function() { this.garply += "foo"; return this; } };
+typeof ::obj.foo === "function" && ::obj.foo().garply === "barfoo";
+
+// 3
+Object.getOwnPropertyDescriptors
+Map.prototype.toJSON
+Set.prototype.toJSON
+String.prototype.at
+String.prototype.lpad
+String.prototype.rpad
+Object.values
+Object.entries
+
+```
+
+[slide]
+## 续4
+---
+
+```javascript
+// 1 parallel JavaScript
+Array.prototype.mapPar
+Array.prototype.filterPar
+Array.fromPar
+// ..等等
+
+// 2
+[for (a of [1, 2, 3]) a * a] + '' === '1,4,9'
+
+// 3
+[for([a, b] of [['a', 'b']])a + b][0] === 'ab'
+
+```
+
+[slide]
+## All Done
+---
+
+Thanks
 
