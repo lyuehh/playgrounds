@@ -1,4 +1,4 @@
-title: ES6(ES2015) 简介
+title: ES6 简介
 speaker: 王伟伟
 url: todo
 transition: move
@@ -220,7 +220,7 @@ c.a === 7 && c.b === 8
 ({ y() { return 2; } }).y() === 2
 
 // 4
-"foo bar"() { return 4; } })["foo bar"]() === 4
+({"foo bar"() { return 4; } })["foo bar"]() === 4
 
 // 5
 var x = 'y',
