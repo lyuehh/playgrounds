@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>g2 demo</title>
+  <script src="g2.js"></script>
+</head>
+<body>
+  <div id="c1"></div>
+  
+  <script type="text/javascript" charset="utf-8">
+
+    var chart = new G2.Chart({
+      id: 'c1',
+      width: 1000,
+      height: 500
+    });
+    var data = [
+      {"month":0,"tem":7,"city":"tokyo"},
+      {"month":1,"tem":6.9,"city":"tokyo"},
+      {"month":2,"tem":9.9,"city":"tokyo"},
+      {"month":0,"tem":1.9,"city":"aa"},
+      {"month":1,"tem":3.9,"city":"aa"},
+      {"month":2,"tem":7.9,"city":"aa"}
+    ];
+    chart.source(data, {
+      month: {
+        alias: '月份'
+      },
+      tem: {
+        alias: 'xx'
+      }
+    }); 
+    chart.line().position('month*tem').color('city');
+    chart.render();
+  </script>
+</body>
+</html>
